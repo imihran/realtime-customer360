@@ -34,3 +34,27 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "raw" {
     }
   }
 }
+
+resource "aws_s3_bucket_lifecycle_configuration" "raw" {
+  bucket = aws_s3_bucket.raw.id
+
+  rule {
+    id     = "delete-after-30-days"
+    status = "Enabled"
+
+    # Apply to the whole bucket (empty prefix)
+    filter {
+      prefix = ""
+    }
+
+    # Expire current objects after 30 days
+    expiration {
+      days = 30
+    }
+
+    # Expire non-current versions after 30 days
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+  }
+}
